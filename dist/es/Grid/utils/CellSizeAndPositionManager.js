@@ -182,6 +182,8 @@ function () {
           break;
 
         default:
+          if (datum.size >= containerSize) idealOffset = maxOffset;
+        else
           idealOffset = Math.max(minOffset, Math.min(maxOffset, currentOffset));
           break;
       }

@@ -175,13 +175,15 @@ function (_React$PureComponent) {
         prevScrollToColumn: props.scrollToColumn,
         prevScrollToRow: props.scrollToRow,
         scrollbarSize: 0,
-        scrollbarSizeMeasured: false
+        scrollbarSizeMeasured: false,
+        prevScrollLeft: props.scrollLeft,
+        prevScrollTop: props.scrollTop,
       },
       isScrolling: false,
       scrollDirectionHorizontal: SCROLL_DIRECTION_FORWARD,
       scrollDirectionVertical: SCROLL_DIRECTION_FORWARD,
-      scrollLeft: 0,
-      scrollTop: 0,
+      scrollLeft: props.scrollLeft || 0,
+      scrollTop: props.scrollTop || 0,
       scrollPositionChangeReason: null,
       needToResetStyleCache: false
     };
@@ -257,7 +259,7 @@ function (_React$PureComponent) {
       // On iOS, we can arrive at negative offsets by swiping past the start.
       // To prevent flicker here, we make playing in the negative offset zone cause nothing to happen.
       if (scrollTopParam < 0) {
-        return;
+        scrollTopParam = 0;
       } // Prevent pointer events from interrupting a smooth scroll
 
 
@@ -1029,12 +1031,13 @@ function (_React$PureComponent) {
     key: "getDerivedStateFromProps",
     value: function getDerivedStateFromProps(nextProps, prevState) {
       var newState = {};
+      var instanceProps = prevState.instanceProps;
 
       if (nextProps.columnCount === 0 && prevState.scrollLeft !== 0 || nextProps.rowCount === 0 && prevState.scrollTop !== 0) {
         newState.scrollLeft = 0;
         newState.scrollTop = 0; // only use scroll{Left,Top} from props if scrollTo{Column,Row} isn't specified
         // scrollTo{Column,Row} should override scroll{Left,Top}
-      } else if (nextProps.scrollLeft !== prevState.scrollLeft && nextProps.scrollToColumn < 0 || nextProps.scrollTop !== prevState.scrollTop && nextProps.scrollToRow < 0) {
+      } else if (nextProps.scrollLeft !== instanceProps.prevScrollLeft && nextProps.scrollToColumn < 0 || nextProps.scrollTop !== instanceProps.prevScrollTop && nextProps.scrollToRow < 0) {
         Object.assign(newState, Grid._getScrollToPositionStateUpdate({
           prevState: prevState,
           scrollLeft: nextProps.scrollLeft,
@@ -1042,7 +1045,7 @@ function (_React$PureComponent) {
         }));
       }
 
-      var instanceProps = prevState.instanceProps; // Initially we should not clearStyleCache
+      // var instanceProps = prevState.instanceProps; // Initially we should not clearStyleCache
 
       newState.needToResetStyleCache = false;
 
@@ -1113,6 +1116,8 @@ function (_React$PureComponent) {
       instanceProps.prevRowHeight = nextProps.rowHeight;
       instanceProps.prevScrollToColumn = nextProps.scrollToColumn;
       instanceProps.prevScrollToRow = nextProps.scrollToRow; // getting scrollBarSize (moved from componentWillMount)
+      instanceProps.prevScrollLeft = nextProps.scrollLeft;
+      instanceProps.prevScrollTop = nextProps.scrollTop;
 
       instanceProps.scrollbarSize = nextProps.getScrollbarSize();
 
